@@ -1,8 +1,4 @@
 var argv = require('yargs/yargs')(process.argv.slice(2)).argv
-// console.log(argv._)
-
-// var title = argv.title
-// var body = argv.body
 
 var fs = require('fs');
 
@@ -15,39 +11,54 @@ function add(title, body){
             note = JSON.parse(data)
             note.push({title:title, body:body})
             fs.writeFileSync('./notes.json', JSON.stringify(note))
-            console.log(note)
         })
     }
     
 }
 
-// add("TITLE1" ,"BODY1")
-
-function remove(Title){
-    var note = []
+function remove(title){
     fs.readFile('./notes.json', (err, data)=>{
         if(err) throw err
-        note = JSON.parse(data.toString())
+        notes = JSON.parse(data.toString())
        
-       note = note.filter((i)=>{
-            return i.title !== Title
+        notes = notes.filter((note)=>{
+            return note.title !== title
         })
-        console.log(note)
-        fs.writeFileSync('./notes.json', JSON.stringify(note))
+        fs.writeFileSync('./notes.json', JSON.stringify(notes))
+    })
+}
+
+function list(){
+    fs.readFile('./notes.json', (err, data)=>{
+        notes = JSON.parse(data.toString())
+        notes.forEach(note => {
+            console.log(note.title)
+        });    
     })
 }
 
 function read(title){
-    fs.readFile('./notes.json')
+    fs.readFile('./notes.json', (err, data)=>{
+        if(err) throw err
+        notes = JSON.parse(data.toString())
+
+        console.log(notes.filter((note)=>{
+            return note.title === title
+        })[0].body)
+    })
 }
 
-remove("title")
 
-// switch(argv._[0]){
-//     case 'add': add(argv.title, argv.body)
-//         console.log(argv.title, argv.body)
-//         break
-//     case 'remove': remove(argv.title)
-//         break
-//     default: console.log('Wrong Input')
-// }
+switch(argv._[0]){
+    case 'add': add(argv.title, argv.body)
+        console.log("Note Added")
+        break
+    case 'remove': remove(argv.title)
+        console.log("Note Removed")
+        break
+    case 'list': list()
+        break
+    case 'read': read(argv.title)
+        break
+    default: console.log('Wrong Input')
+}
